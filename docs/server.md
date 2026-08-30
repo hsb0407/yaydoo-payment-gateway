@@ -54,4 +54,4 @@ module.exports = app;
 - **Helmet**: Headers HTTP seguros (XSS, clickjacking, etc.)
 - **CORS**: Control de acceso por origins
 - **Body Parsing**: JSON para rutas normales, raw para webhooks
-- **Logging**: Registra cada请求 con timestamp
+- **Logging**: Registra cada con timestamp

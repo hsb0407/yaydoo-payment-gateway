@@ -50,15 +50,15 @@ npm run dev
 
 ### Webhooks
 
-| Método | Ruta | Descripción |
-|--------|------|-------------|
-| POST | `/api/webhooks/yaydoo` | Recibir eventos de Yaydoo |
+| Método | Ruta                   | Descripción               |
+|--------|------------------------|---------------------------|
+| POST   | `/api/webhooks/yaydoo` | Recibir eventos de Yaydoo |
 
 ### Salud
 
-| Método | Ruta | Descripción |
-|--------|------|-------------|
-| GET | `/api/health` | Verificar estado del servidor |
+| Método | Ruta          | Descripción                   |
+|--------|---------------|-------------------------------|
+| GET    | `/api/health` | Verificar estado del servidor |
 
 ## Ejemplo de Uso
 
@@ -87,7 +87,7 @@ yaydoo-payment-gateway/
 ├── src/
 │   ├── config/         # Configuración
 │   ├── controllers/    # Controladores
-│   ├── middleware/      # Middleware (auth, validation, errors)
+│   ├── middleware/     # Middleware (auth, validation, errors)
 │   ├── routes/         # Rutas API
 │   └── services/       # Servicios (Yaydoo API)
 ├── examples/           # Ejemplos de uso

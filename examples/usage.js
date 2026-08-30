@@ -7,10 +7,10 @@ async function exampleUsage() {
     // 1. Create a payment
     console.log('1. Creating payment...');
     const createResponse = await axios.post(`${API_BASE_URL}/payments/create`, {
-      amount: 100.50,
+      amount: 400.00,
       currency: 'MXN',
-      description: 'Compra de ejemplo',
-      customerEmail: 'cliente@ejemplo.com',
+      description: 'Pago de Mantenimiento',
+      customerEmail: 'hugo.santiago.b@gmail.com',
       metadata: {
         orderId: 'ORDER-123',
       },

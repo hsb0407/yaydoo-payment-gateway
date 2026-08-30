@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Yaydoo Payment Gateway — Demo</title>
+  <style>
+    :root {
+      --bg: #0f1220;
+      --panel: #181c2e;
+      --panel-2: #1f2438;
+      --border: #2a3050;
+      --text: #e6e9f5;
+      --muted: #9aa3c0;
+      --accent: #5b8cff;
+      --accent-2: #7c5bff;
+      --ok: #34d399;
+      --err: #f87171;
+      --warn: #fbbf24;
+      --radius: 12px;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: radial-gradient(1200px 600px at 20% -10%, #232a4d 0%, var(--bg) 55%);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      padding: 32px 20px;
+    }
+    .wrap { max-width: 1100px; margin: 0 auto; }
+    header { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; flex-wrap: wrap; }
+    .logo {
+      width: 44px; height: 44px; border-radius: 12px; flex: none;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: grid; place-items: center; font-weight: 800; font-size: 20px; color: #fff;
+    }
+    h1 { font-size: 22px; letter-spacing: .2px; }
+    .badge {
+      font-size: 11px; padding: 4px 10px; border-radius: 999px;
+      background: rgba(52, 211, 153, .12); color: var(--ok);
+      border: 1px solid rgba(52, 211, 153, .35);
+    }
+    .grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 20px; }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+    .panel {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 20px;
+    }
+    .panel h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--muted); margin-bottom: 16px; }
+    label { display: block; font-size: 12px; color: var(--muted); margin: 12px 0 6px; }
+    input, select {
+      width: 100%; background: var(--panel-2); border: 1px solid var(--border);
+      color: var(--text); border-radius: 8px; padding: 10px 12px; font-size: 14px; outline: none;
+    }
+    input:focus, select:focus { border-color: var(--accent); }
+    input[readonly] { color: var(--muted); }
+    .row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    button {
+      font-size: 13px; font-weight: 600; cursor: pointer; border-radius: 8px; border: none;
+      padding: 10px 16px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff;
+      transition: filter .15s, transform .05s;
+    }
+    button:hover { filter: brightness(1.12); }
+    button:active { transform: translateY(1px); }
+    button:disabled { filter: grayscale(.7) brightness(.6); cursor: not-allowed; }
+    .btn-secondary { background: var(--panel-2); border: 1px solid var(--border); color: var(--text); }
+    .btn-danger { background: linear-gradient(135deg, #ef4444, #b45309); }
+    .btn-ghost { background: transparent; border: 1px dashed var(--border); color: var(--muted); }
+    .block { width: 100%; margin-top: 14px; padding: 13px; font-size: 14px; }
+    .steps { list-style: none; counter-reset: step; margin-top: 8px; }
+    .steps li {
+      counter-increment: step; position: relative; padding: 10px 10px 10px 46px;
+      border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px;
+      background: var(--panel-2);
+    }
+    .steps li::before {
+      content: counter(step); position: absolute; left: 12px; top: 10px;
+      width: 24px; height: 24px; border-radius: 50%;
+      background: var(--panel-2); border: 1px solid var(--border);
+      display: grid; place-items: center; font-size: 12px; color: var(--muted); font-weight: 700;
+    }
+    .steps li.done { border-color: rgba(52, 211, 153, .5); }
+    .steps li.done::before { background: var(--ok); border-color: var(--ok); color: #06281b; }
+    .steps li .step-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .steps li .name { font-weight: 600; font-size: 14px; }
+    .steps li .desc { font-size: 12px; color: var(--muted); margin-top: 3px; }
+    .steps li .meta { font-size: 11px; color: var(--ok); font-family: var(--mono); white-space: nowrap; }
+    .steps .actions { display: flex; gap: 8px; margin-top: 10px; }
+    .terminal {
+      background: #0a0d17; border: 1px solid var(--border); border-radius: 10px;
+      font-family: var(--mono); font-size: 12px; line-height: 1.6;
+      padding: 14px; height: 320px; overflow-y: auto; white-space: pre-wrap; word-break: break-word;
+    }
+    .terminal .t-time { color: #5c6b8f; margin-right: 8px; }
+    .terminal .t-step { color: var(--accent); font-weight: 700; }
+    .terminal .ok { color: var(--ok); }
+    .terminal .err { color: var(--err); }
+    .terminal .muted { color: var(--muted); }
+    .tok-val { font-family: var(--mono); font-size: 12px; color: var(--muted); word-break: break-all; margin-top: 8px; }
+    .footer-note { margin-top: 20px; font-size: 12px; color: var(--muted); text-align: center; }
+    .spinner {
+      width: 13px; height: 13px; border-radius: 50%; display: inline-block; vertical-align: -2px;
+      border: 2px solid rgba(255,255,255,.3); border-top-color: #fff; animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">YP</div>
+      <h1>Yaydoo Payment Gateway — Demo</h1>
+      <span class="badge">flujo completo vs mock :4000</span>
+    </header>
+
+    <div class="grid">
+      <div>
+        <div class="panel">
+          <h2>Configuración</h2>
+          <label>JWT Secret (firma del token)</label>
+          <div class="row-2">
+            <input id="jwtSecret" value="dev_jwt_secret" spellcheck="false" />
+            <button id="btnGenToken" class="btn-secondary" type="button">Generar token</button>
+          </div>
+          <div class="tok-val" id="tokenDisplay">—</div>
+
+          <div class="row" style="margin-top:14px">
+            <div>
+              <label>Monto (MXN)</label>
+              <input id="amount" type="number" value="100.50" step="0.01" min="0" />
+            </div>
+            <div>
+              <label>Moneda</label>
+              <input id="currency" value="MXN" maxlength="3" />
+            </div>
+            <div>
+              <label>Cantidad</label>
+              <select id="qty">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+              </select>
+            </div>
+          </div>
+          <div class="row" style="margin-top:12px">
+            <div>
+              <label>Marca (tarjeta)</label>
+              <select id="brand">
+                <option value="visa">Visa</option>
+                <option value="mastercard">Mastercard</option>
+                <option value="amex">Amex</option>
+              </select>
+            </div>
+            <div>
+              <label>Método de pago</label>
+              <select id="pmType">
+                <option value="card">card</option>
+                <option value="spei">spei</option>
+                <option value="oxxo">oxxo</option>
+                <option value="paypal">paypal</option>
+              </select>
+            </div>
+            <div>
+              <label>Reembolso (cantidad)</label>
+              <input id="refundAmount" type="number" value="50" step="0.01" min="0" />
+            </div>
+          </div>
+          <label style="margin-top:14px">Email del cliente</label>
+          <input id="email" value="cliente@ejemplo.com" />
+          <label>Descripción</label>
+          <input id="description" value="Compra de demo" />
+
+          <button id="btnCreate" class="btn-secondary" style="margin-top:14px" type="button">Crear pago</button>
+          <button id="btnRunAll" class="block" type="button">Ejecutar flujo completo</button>
+        </div>
+
+        <div class="panel" style="margin-top:20px">
+          <h2>Pasos del flujo</h2>
+          <ul class="steps" id="steps">
+            <li id="step-1">
+              <div class="step-top"><div class="name">Crear payment intent</div><span class="meta" id="meta-1"></span></div>
+              <div class="desc">POST /api/payments/create — estado <code>requires_confirmation</code></div>
+            </li>
+            <li id="step-2">
+              <div class="step-top"><div class="name">Listar métodos</div><span class="meta" id="meta-2"></span></div>
+              <div class="desc">GET /api/payments/methods/list</div>
+            </li>
+            <li id="step-3">
+              <div class="step-top"><div class="name">Consultar pago</div><span class="meta" id="meta-3"></span></div>
+              <div class="desc">GET /api/payments/:id</div>
+            </li>
+            <li id="step-4">
+              <div class="step-top"><div class="name">Confirmar pago</div><span class="meta" id="meta-4"></span></div>
+              <div class="desc">POST /api/payments/:id/confirm — estado <code>succeeded</code></div>
+              <div class="actions">
+                <button id="btnConfirm" class="btn-secondary" type="button">Confirmar</button>
+              </div>
+            </li>
+            <li id="step-5">
+              <div class="step-top"><div class="name">Reembolsar</div><span class="meta" id="meta-5"></span></div>
+              <div class="desc">POST /api/payments/:id/refund — crea reembolso <code>rf_...</code></div>
+              <div class="actions">
+                <button id="btnRefund" class="btn-secondary" type="button">Reembolsar</button>
+              </div>
+            </li>
+            <li id="step-6">
+              <div class="step-top"><div class="name">Cancelar</div><span id="meta-6" class="meta"></span></div>
+              <div class="desc">POST /api/payments/:id/cancel — estado <code>cancelled</code></div>
+              <div class="actions">
+                <button id="btnCancel" class="btn-secondary btn-danger" type="button">Cancelar</button>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div>
+        <div class="panel" style="position:sticky; top:20px">
+          <h2>Log de respuestas</h2>
+          <div class="terminal" id="log"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-note">
+      Requiere el mock (node mock/yaydoo.mock.js) y el gateway (npm run dev). Página servida en <b>http://localhost:3000</b>.
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = '/api';
+    const $ = (id) => document.getElementById(id);
+
+    const state = {
+      token: null,
+      paymentId: null,
+      payment: null,
+      refundId: null,
+      methods: null,
+      running: false,
+    };
+
+    /* ---------- utilidades ---------- */
+    const b64urlFromBytes = (bytes) => {
+      let s = '';
+      bytes.forEach((b) => { s += String.fromCharCode(b); });
+      return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    };
+    const b64urlFromStr = (str) =>
+      btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+
+    async function generateToken(secret) {
+      const header = { alg: 'HS256', typ: 'JWT' };
+      const now = Math.floor(Date.now() / 1000);
+      const payload = { sub: 'demo', iat: now, exp: now + 3600 };
+      const data = b64urlFromStr(JSON.stringify(header)) + '.' + b64urlFromStr(JSON.stringify(payload));
+      const enc = new TextEncoder();
+      const key = await crypto.subtle.importKey('raw', enc.encode(secret),
+        { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+      const sig = await crypto.subtle.sign('HMAC', key, enc.encode(data));
+      return data + '.' + b64urlFromBytes(new Uint8Array(sig));
+    }
+
+    async function api(path, { method = 'GET', body } = {}) {
+      if (!state.token) state.token = await generateToken($('jwtSecret').value);
+      const res = await fetch(API_BASE + path, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + state.token,
+        },
+        body: body ? JSON.stringify(body) : undefined,
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(`HTTP ${res.status}: ${JSON.stringify(data)}`);
+      return data;
+    }
+
+    /* ---------- log ---------- */
+    function log(msg, cls = '') {
+      const time = new Date().toTimeString().slice(0, 8);
+      const line = document.createElement('div');
+      line.innerHTML = `<span class="t-time">${time}</span>${msg}`;
+      if (cls) line.classList.add(cls);
+      $('log').appendChild(line);
+      $('log').scrollTop = $('log').scrollHeight;
+    }
+    function logStep(name, data) {
+      log(`<span class="t-step">${name}</span> <span class="muted">→</span> ${JSON.stringify(data)}`);
+    }
+    function logOk(msg) { log('<span class="ok">✓</span> ' + msg, 'ok'); }
+    function logErr(err) { log('<span class="err">✗</span> ' + err.message, 'err'); }
+
+    /* ---------- estado por pasos ---------- */
+    function markStep(n, meta) {
+      $('step-' + n).classList.add('done');
+      $('meta-' + n).textContent = meta || '';
+    }
+    function resetSteps(from = 1) {
+      for (let i = from; i <= 6; i++) {
+        $('step-' + i).classList.remove('done');
+        $('meta-' + i).textContent = '';
+      }
+    }
+
+    function withSpinner(el, fn) {
+      return async () => {
+        if (state.running) return;
+        const old = el.textContent;
+        el.disabled = true;
+        el.innerHTML = '<span class="spinner"></span>';
+        try { await fn(); } finally { el.innerHTML = old; el.disabled = false; }
+      };
+    }
+
+    /* ---------- pasos ---------- */
+    async function doListMethods() {
+      const data = await api('/payments/methods/list');
+      state.methods = data.data.methods;
+      logStep('Métodos disponibles', state.methods.map((m) => m.type));
+      markStep(2, state.methods.map((m) => m.type).join(', '));
+      logOk('Métodos obtenidos');
+      return state.methods;
+    }
+
+    async function doCreate() {
+      const amount = parseFloat($('amount').value);
+      const currency = $('currency').value.toUpperCase();
+      const description = $('description').value;
+      const customerEmail = $('email').value;
+      const qty = parseInt($('qty').value, 10);
+
+      const data = await api('/payments/create', {
+        method: 'POST',
+        body: {
+          amount,
+          currency,
+          description,
+          customerEmail,
+          metadata: { qty, brand: $('brand').value, orderId: 'ORDER-' + Date.now() },
+        },
+      });
+      state.paymentId = data.data.id;
+      logStep('Pago creado', data.data);
+      markStep(1, state.paymentId);
+      logOk('Payment intent creado: ' + state.paymentId);
+      return data.data;
+    }
+
+    async function doGet() {
+      if (!state.paymentId) throw new Error('Primero crea un pago');
+      const data = await api('/payments/' + state.paymentId);
+      state.payment = data.data;
+      logStep('Detalle del pago', data.data);
+      markStep(3, state.payment.status);
+      logOk('Pago consultado.');
+      return data.data;
+    }
+
+    async function doConfirm() {
+      if (!state.paymentId) throw new Error('Primero crea un pago');
+      const data = await api('/payments/' + state.paymentId + '/confirm', {
+        method: 'POST',
+        body: { paymentMethod: { type: $('pmType').value, token: 'tok_test_123' } },
+      });
+      logStep('Pago confirmado', data.data);
+      markStep(4, data.data.status);
+      logOk('Pago confirmado: ' + data.data.status);
+      state.payment = data.data;
+      return data.data;
+    }
+
+    async function doRefund() {
+      if (!state.paymentId) throw new Error('Primero crea un pago');
+      const amount = parseFloat($('refundAmount').value);
+      const data = await api('/payments/' + state.paymentId + '/refund', {
+        method: 'POST',
+        body: { amount },
+      });
+      state.refundId = data.data.id;
+      logStep('Reembolso', data.data);
+      markStep(5, state.refundId);
+      logOk('Reembolso creado: ' + state.refundId);
+      return data.data;
+    }
+
+    async function doCancel() {
+      let id = state.paymentId;
+      if (!id) {
+        const created = await doCreate();
+        id = state.paymentId;
+      }
+      const data = await api('/payments/' + id + '/cancel', { method: 'POST' });
+      logStep('Pago cancelado', data.data);
+      markStep(6, data.data.status);
+      logOk('Pago cancelado: ' + data.data.status);
+      state.payment = data.data;
+      return data.data;
+    }
+
+    async function runAll() {
+      state.running = true;
+      resetSteps();
+      try {
+        state.token = await generateToken($('jwtSecret').value);
+        $('tokenDisplay').textContent = state.token;
+        log('<span class="t-step">Iniciando flujo completo</span>');
+        await doListMethods();
+        await doCreate();
+        await doGet();
+        await doConfirm();
+        await doRefund();
+        await doCancel();
+        logOk('<b>Flujo completo terminado.</b>');
+      } catch (e) {
+        logErr(e);
+      } finally {
+        state.running = false;
+      }
+    }
+
+    /* ---------- eventos ---------- */
+    $('btnGenToken').addEventListener('click', withSpinner($('btnGenToken'), async () => {
+      state.token = await generateToken($('jwtSecret').value);
+      $('tokenDisplay').textContent = state.token;
+      logOk('Token JWT generado (' + state.token.length + ' chars)');
+    }));
+
+    $('btnCreate').addEventListener('click', withSpinner($('btnCreate'), async () => {
+      resetSteps();
+      await doCreate();
+      await doGet();
+    }));
+
+    $('btnRunAll').addEventListener('click', withSpinner($('btnRunAll'), runAll));
+
+    $('btnConfirm').addEventListener('click', withSpinner($('btnConfirm'), doConfirm));
+    $('btnRefund').addEventListener('click', withSpinner($('btnRefund'), doRefund));
+    $('btnCancel').addEventListener('click', withSpinner($('btnCancel'), doCancel));
+
+    /* inicialización */
+    (async () => {
+      state.token = await generateToken($('jwtSecret').value);
+      $('tokenDisplay').textContent = state.token;
+      log('Listo. Token JWT generado automáticamente.<br>Servidor: <b>http://localhost:3000</b> · Mock: <b>http://localhost:4000</b>');
+      log('Presiona <span class="t-step">Crear pago</span> o <span class="t-step">Ejecutar flujo completo</span>.');
+    })().catch((e) => logErr(e));
+  </script>
+</body>
+</html>

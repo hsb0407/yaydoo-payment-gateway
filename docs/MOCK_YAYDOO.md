@@ -74,21 +74,21 @@ TOKEN="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0IiwiaWF0IjoxNzg3OTYw
 # 1. Crear pago
 curl -s -X POST http://localhost:3000/api/payments/create \
   -H "Content-Type: application/json" -H "Authorization: Bearer $TOKEN" \
-  -d '{"amount":100.5,"currency":"MXN","description":"Compra test","customerEmail":"cliente@ejemplo.com","metadata":{"orderId":"ORDER-123"}}'
+  -d '{"amount":100.5,"currency":"MXN","description":"Compra test","customerEmail":"hugo.santiago.b@gmail.com","metadata":{"orderId":"ORDER-123"}}'
 
 # 2. Listar métodos de pago
 curl -s http://localhost:3000/api/payments/methods/list -H "Authorization: Bearer $TOKEN"
 
 # 3. Consultar pago (usa el id devuelto en el paso 1)
-curl -s http://localhost:3000/api/payments/pi_XXXX -H "Authorization: Bearer $TOKEN"
+curl -s http://localhost:3000/api/payments/pi_bef672d0-9d25-42f6-b195-34b1491bf810 -H "Authorization: Bearer $TOKEN"
 
 # 4. Confirmar pago
-curl -s -X POST http://localhost:3000/api/payments/pi_XXXX/confirm \
+curl -s -X POST http://localhost:3000/api/payments/pi_bef672d0-9d25-42f6-b195-34b1491bf810/confirm \
   -H "Content-Type: application/json" -H "Authorization: Bearer $TOKEN" \
   -d '{"paymentMethod":{"type":"card","token":"tok_test_123"}}'
 
 # 5. Reembolsar
-curl -s -X POST http://localhost:3000/api/payments/pi_XXXX/refund \
+curl -s -X POST http://localhost:3000/api/payments/pi_bef672d0-9d25-42f6-b195-34b1491bf810/refund \
   -H "Content-Type: application/json" -H "Authorization: Bearer $TOKEN" \
   -d '{"amount":50}'
 

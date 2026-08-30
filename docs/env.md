@@ -39,7 +39,7 @@ cp .env.example .env
 ## Variables
 
 | Variable          | Requerido | Descripción                                          |
-|----------         |-----------|-------------                                         |
+|-------------------|-----------|------------------------------------------------------|
 | PORT              | No        | Puerto del servidor (default: 3000)                  |
 | NODE_ENV          | No        | development o production                             |
 | YAYDOO_API_URL    | No        | URL base de Yaydoo (default: https://api.yaydoo.com) |

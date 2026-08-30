@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
 const helmet = require('helmet');
 const config = require('./config');
@@ -8,7 +9,16 @@ const errorHandler = require('./middleware/errorHandler');
 const app = express();
 
 // Security middleware
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+      // Demo page uses inline styles/scripts
+      'script-src': ["'self'", "'unsafe-inline'"],
+      'style-src': ["'self'", "'unsafe-inline'"],
+    },
+  },
+}));
 app.use(cors({
   origin: config.cors.allowedOrigins,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
@@ -17,6 +27,8 @@ app.use(cors({
 
 // Body parsing (webhook route needs raw body, others need JSON)
 app.use('/api/webhooks', express.raw({ type: 'application/json' }));
+// Static files (demo page)
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 
 // Request logging

@@ -54,13 +54,13 @@ module.exports = router;
 
 ## Mapa de Endpoints
 
-| Método | Ruta | Middleware | Controlador |
-|--------|------|------------|-------------|
-| POST | `/api/payments/create` | auth, validation | createPayment |
-| GET | `/api/payments/:id` | auth | getPayment |
-| POST | `/api/payments/:id/confirm` | auth | confirmPayment |
-| POST | `/api/payments/:id/cancel` | auth | cancelPayment |
-| POST | `/api/payments/:id/refund` | auth, validation | refundPayment |
-| GET | `/api/payments/methods/list` | auth | getPaymentMethods |
-| POST | `/api/webhooks/yaydoo` | raw body | handleWebhook |
-| GET | `/api/health` | - | health check |
+| Método | Ruta                         | Middleware               | Controlador       |
+|--------|------------------------------|--------------------------|-------------------|
+| POST   | `/api/payments/create`       | auth, validation         | createPayment     |
+| GET    | `/api/payments/:id`          | auth                     | getPayment        |
+| POST   | `/api/payments/:id/confirm`  | auth                     | confirmPayment    |
+| POST   | `/api/payments/:id/cancel`   | auth                     | cancelPayment     |
+| POST   | `/api/payments/:id/refund`   | auth, validation         | refundPayment     |
+| GET    | `/api/payments/methods/list` | auth                     | getPaymentMethods |
+| POST   | `/api/webhooks/yaydoo`       | raw body                 | handleWebhook     |
+| GET    | `/api/health`                | -                        | health check      |

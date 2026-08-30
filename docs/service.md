@@ -116,18 +116,18 @@ module.exports = new YaydooService();
 
 ## Métodos
 
-| Método | Descripción |
-|--------|-------------|
-| `createPaymentIntent(data)` | Crea un intent de pago |
-| `getPaymentIntent(id)` | Obtiene detalles de un pago |
-| `confirmPayment(id, method)` | Confirma un pago |
-| `cancelPayment(id)` | Cancela un pago |
-| `refundPayment(id, amount)` | Reembolsa un pago |
-| `createInvoice(data)` | Crea una factura |
-| `getInvoice(id)` | Obtiene una factura |
-| `createAccountReceivable(data)` | Crea cuenta por cobrar |
-| `getPaymentMethods()` | Lista métodos de pago disponibles |
-| `verifyWebhookSignature(payload, sig)` | Verifica firma de webhook |
+| Método                                 | Descripción                       |
+|----------------------------------------|-----------------------------------|
+| `createPaymentIntent(data)`            | Crea un intent de pago            |
+| `getPaymentIntent(id)`                 | Obtiene detalles de un pago       |
+| `confirmPayment(id, method)`           | Confirma un pago                  |
+| `cancelPayment(id)`                    | Cancela un pago                   |
+| `refundPayment(id, amount)`            | Reembolsa un pago                 |
+| `createInvoice(data)`                  | Crea una factura                  |
+| `getInvoice(id)`                       | Obtiene una factura               |
+| `createAccountReceivable(data)`        | Crea cuenta por cobrar            |
+| `getPaymentMethods()`                  | Lista métodos de pago disponibles |
+| `verifyWebhookSignature(payload, sig)` | Verifica firma de webhook         |
 
 ## Conversión de Montos
 

@@ -47,16 +47,16 @@ module.exports = { validatePayment, validateRefund };
 ## Validaciones
 
 ### createPayment
-| Campo | Regla | Ejemplo |
-|-------|-------|---------|
-| `amount` | Número > 0 | 100.50 |
-| `currency` | String, 3 letras mayúsculas ISO | MXN, USD |
-| `description` | String requerido | "Compra de ejemplo" |
+| Campo         | Regla                           | Ejemplo             |
+|-------        |-------                          |---------            |
+| `amount`      | Número > 0                      | 100.50              |
+| `currency`    | String, 3 letras mayúsculas ISO | MXN, USD            |
+| `description` | String requerido                | "Compra de ejemplo" |
 
 ### refundPayment
-| Campo | Regla | Ejemplo |
-|-------|-------|---------|
-| `amount` | Opcional, número > 0 | 50.00 |
+| Campo    | Regla                | Ejemplo |
+|-------   |-------               |---------|
+| `amount` | Opcional, número > 0 | 50.00   |
 
 ## Respuesta de Error (400)
 ```json

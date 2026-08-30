@@ -17,16 +17,16 @@
 ```
 yaydoo-payment-gateway/
 ├── docs/
-│   ├── index.md              # Este archivo
-│   ├── server.md             # Servidor principal
-│   ├── config.md             # Configuración
-│   ├── env.md                # Variables de entorno
-│   ├── service.md            # Servicio Yaydoo
-│   ├── controller.md         # Controlador de pagos
-│   ├── routes.md             # Rutas API
-│   ├── auth-middleware.md    # Autenticación JWT
+│   ├── index.md                 # Este archivo
+│   ├── server.md                # Servidor principal
+│   ├── config.md                # Configuración
+│   ├── env.md                   # Variables de entorno
+│   ├── service.md               # Servicio Yaydoo
+│   ├── controller.md            # Controlador de pagos
+│   ├── routes.md                # Rutas API
+│   ├── auth-middleware.md       # Autenticación JWT
 │   ├── validation-middleware.md # Validación
-│   └── error-handler.md      # Manejo de errores
+│   └── error-handler.md         # Manejo de errores
 ├── src/
 │   ├── config/
 │   ├── controllers/
@@ -57,13 +57,13 @@ npm start
 
 ## Endpoints Disponibles
 
-| Método | Ruta | Descripción |
-|--------|------|-------------|
-| POST | `/api/payments/create` | Crear pago |
-| GET | `/api/payments/:id` | Consultar pago |
-| POST | `/api/payments/:id/confirm` | Confirmar pago |
-| POST | `/api/payments/:id/cancel` | Cancelar pago |
-| POST | `/api/payments/:id/refund` | Reembolsar pago |
-| GET | `/api/payments/methods/list` | Métodos de pago |
-| POST | `/api/webhooks/yaydoo` | Webhooks |
-| GET | `/api/health` | Estado del servidor |
+| Método | Ruta                         | Descripción         |
+|--------|------------------------------|---------------------|
+| POST   | `/api/payments/create`       | Crear pago          |
+| GET    | `/api/payments/:id`          | Consultar pago      |
+| POST   | `/api/payments/:id/confirm`  | Confirmar pago      |
+| POST   | `/api/payments/:id/cancel`   | Cancelar pago       |
+| POST   | `/api/payments/:id/refund`   | Reembolsar pago     |
+| GET    | `/api/payments/methods/list` | Métodos de pago     |
+| POST   | `/api/webhooks/yaydoo`       | Webhooks            |
+| GET    | `/api/health`                | Estado del servidor |

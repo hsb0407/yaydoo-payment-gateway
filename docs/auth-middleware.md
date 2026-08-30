@@ -44,7 +44,7 @@ router.get('/protected', authenticate, controller.method);
 ### Generar token
 ```javascript
 const { generateToken } = require('./middleware/auth');
-const token = generateToken({ userId: 123, email: 'user@example.com' });
+const token = generateToken({ userId: 123, email: 'hugo.santiago.b@gmail.com' });
 ```
 
 ## Headers requeridos
