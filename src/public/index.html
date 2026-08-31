@@ -177,6 +177,41 @@
         </div>
 
         <div class="panel" style="margin-top:20px">
+          <h2>Tarjeta — captura simulada en el navegador</h2>
+          <label>Tarjeta de prueba</label>
+          <select id="testCard">
+            <option value="visa">Visa — 4111 1111 1111 1111</option>
+            <option value="mastercard">Mastercard — 5555 5555 5555 4444</option>
+            <option value="amex">Amex — 3782 822463 10005</option>
+          </select>
+          <div class="row-2" style="margin-top:10px">
+            <div>
+              <label>Número de tarjeta</label>
+              <input id="cardNumber" inputmode="numeric" placeholder="4111 1111 1111 1111" maxlength="19" autocomplete="off" />
+            </div>
+            <div>
+              <label>Titular</label>
+              <input id="cardName" placeholder="NOMBRE COMO EN LA TARJETA" />
+            </div>
+          </div>
+          <div class="row" style="margin-top:12px">
+            <div>
+              <label>Vencimiento (MM/AA)</label>
+              <input id="cardExpiry" placeholder="08/29" maxlength="5" inputmode="numeric" autocomplete="off" />
+            </div>
+            <div>
+              <label>CVV</label>
+              <input id="cardCvv" placeholder="123" maxlength="4" inputmode="numeric" autocomplete="off" />
+            </div>
+            <div style="display:flex; flex-direction:column; justify-content:flex-end">
+              <button id="btnCardToken" class="btn-secondary block" style="margin-top:0" type="button">Generar token</button>
+            </div>
+          </div>
+          <div class="tok-val" id="cardTokenDisplay">—</div>
+          <div id="cardFeedback" style="font-size:12px; margin-top:6px; color:var(--err)"></div>
+        </div>
+
+        <div class="panel" style="margin-top:20px">
           <h2>Pasos del flujo</h2>
           <ul class="steps" id="steps">
             <li id="step-1">
@@ -240,6 +275,9 @@
       refundId: null,
       methods: null,
       running: false,
+      cardToken: null,
+      cardBrand: null,
+      cardLast4: null,
     };
 
     /* ---------- utilidades ---------- */
@@ -293,6 +331,81 @@
     function logOk(msg) { log('<span class="ok">✓</span> ' + msg, 'ok'); }
     function logErr(err) { log('<span class="err">✗</span> ' + err.message, 'err'); }
 
+    /* ---------- tarjeta simulada ---------- */
+    const TEST_CARDS = {
+      visa: '4111 1111 1111 1111',
+      mastercard: '5555 5555 5555 4444',
+      amex: '3782 822463 10005',
+    };
+
+    function detectBrand(num) {
+      if (/^4/.test(num)) return 'visa';
+      if (/^(5[1-5]|2[2-7])/.test(num)) return 'mastercard';
+      if (/^3[47]/.test(num)) return 'amex';
+      return 'unknown';
+    }
+
+    function luhn(cardNo) {
+      let sum = 0, dbl = false;
+      for (let i = cardNo.length - 1; i >= 0; i--) {
+        let d = +cardNo[i];
+        if (dbl) { d *= 2; if (d > 9) d -= 9; }
+        sum += d; dbl = !dbl;
+      }
+      return sum % 10 === 0;
+    }
+
+    function formatCardNumber(value) {
+      const digits = value.replace(/\D+/g, '');
+      if (detectBrand(digits) === 'amex') {
+        const g = digits.match(/^(\d{0,4})(\d{0,6})(\d{0,5})/);
+        return [g[1], g[2], g[3]].filter(Boolean).join(' ');
+      }
+      return digits.replace(/(\d{4})(?=\d)/g, '$1 ');
+    }
+
+    function formatExpiry(value) {
+      const d = value.replace(/\D+/g, '').slice(0, 4);
+      if (d.length <= 2) return d;
+      return d.slice(0, 2) + '/' + d.slice(2);
+    }
+
+    function validateCard() {
+      const errors = [];
+      const num = $('cardNumber').value.replace(/\s+/g, '');
+      const exp = $('cardExpiry').value.trim();
+      const cvv = $('cardCvv').value.trim();
+      if (!/^\d{13,16}$/.test(num) || !luhn(num)) errors.push('Número inválido (Luhn)');
+      if ($('cardName').value.trim().length < 3) errors.push('Titular requerido');
+      const m = exp.match(/^(\d{2})\/(\d{2})$/);
+      const now = new Date();
+      if (!m) errors.push('Vencimiento en formato MM/AA');
+      else if (+m[1] < 1 || +m[1] > 12) errors.push('Mes inválido');
+      else if (+m[2] + 2000 < now.getFullYear() || (+m[2] + 2000 === now.getFullYear() && +m[1] < now.getMonth() + 1)) errors.push('Tarjeta vencida');
+      const brand = detectBrand(num);
+      const cvvLen = brand === 'amex' ? 4 : 3;
+      if (!new RegExp('^\\d{' + cvvLen + '}$').test(cvv)) errors.push('CVV de ' + cvvLen + ' dígitos');
+      return { errors, card: { num, brand, last4: num.slice(-4) } };
+    }
+
+    function tokenizeCard() {
+      const { errors, card } = validateCard();
+      if (errors.length) {
+        $('cardFeedback').textContent = errors.join(' · ');
+        throw new Error('Datos de tarjeta inválidos: ' + errors.join(', '));
+      }
+      const token = 'tok_card_' + card.brand + '_' + Math.random().toString(16).slice(2, 10);
+      state.cardToken = token;
+      state.cardBrand = card.brand;
+      state.cardLast4 = card.last4;
+      $('cardTokenDisplay').textContent = token;
+      $('cardFeedback').textContent = '';
+      $('brand').value = card.brand;
+      logStep('Token de tarjeta', { token, brand: card.brand, last4: card.last4 });
+      logOk('Tarjeta validada: ' + card.brand.toUpperCase() + ' •••• ' + card.last4);
+      return token;
+    }
+
     /* ---------- estado por pasos ---------- */
     function markStep(n, meta) {
       $('step-' + n).classList.add('done');
@@ -311,7 +424,7 @@
         const old = el.textContent;
         el.disabled = true;
         el.innerHTML = '<span class="spinner"></span>';
-        try { await fn(); } finally { el.innerHTML = old; el.disabled = false; }
+        try { await fn(); } catch (e) { logErr(e); } finally { el.innerHTML = old; el.disabled = false; }
       };
     }
 
@@ -361,9 +474,15 @@
 
     async function doConfirm() {
       if (!state.paymentId) throw new Error('Primero crea un pago');
+      const type = $('pmType').value;
+      let paymentMethod = { type, token: 'tok_test_123' };
+      if (type === 'card') {
+        const token = tokenizeCard();
+        paymentMethod = { type: 'card', token, brand: state.cardBrand, last4: state.cardLast4 };
+      }
       const data = await api('/payments/' + state.paymentId + '/confirm', {
         method: 'POST',
-        body: { paymentMethod: { type: $('pmType').value, token: 'tok_test_123' } },
+        body: { paymentMethod },
       });
       logStep('Pago confirmado', data.data);
       markStep(4, data.data.status);
@@ -440,10 +559,47 @@
     $('btnRefund').addEventListener('click', withSpinner($('btnRefund'), doRefund));
     $('btnCancel').addEventListener('click', withSpinner($('btnCancel'), doCancel));
 
+    $('testCard').addEventListener('change', () => {
+      const card = $('testCard').value;
+      $('cardNumber').value = TEST_CARDS[card];
+      $('brand').value = card;
+      $('cardFeedback').textContent = '';
+      $('cardNumber').dispatchEvent(new Event('input'));
+    });
+
+    $('cardNumber').addEventListener('input', () => {
+      const el = $('cardNumber');
+      el.value = formatCardNumber(el.value);
+      const brand = detectBrand(el.value.replace(/\s+/g, ''));
+      if (brand !== 'unknown') $('brand').value = brand;
+    });
+
+    $('cardExpiry').addEventListener('input', () => {
+      $('cardExpiry').value = formatExpiry($('cardExpiry').value);
+    });
+
+    $('btnCardToken').addEventListener('click', withSpinner($('btnCardToken'), () => {
+      tokenizeCard();
+      $('cardTokenDisplay').textContent = state.cardToken;
+    }));
+
+    $('pmType').addEventListener('change', () => {
+      const isCard = $('pmType').value === 'card';
+      ['testCard', 'cardNumber', 'cardName', 'cardExpiry', 'cardCvv', 'btnCardToken'].forEach((id) => {
+        $(id).disabled = !isCard;
+      });
+    });
+
     /* inicialización */
     (async () => {
       state.token = await generateToken($('jwtSecret').value);
       $('tokenDisplay').textContent = state.token;
+      const d = new Date();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const yy = String((d.getFullYear() + 1) % 100).padStart(2, '0');
+      $('cardExpiry').value = mm + '/' + yy;
+      $('cardName').value = 'HUGO SANTIAGO';
+      $('testCard').dispatchEvent(new Event('change'));
       log('Listo. Token JWT generado automáticamente.<br>Servidor: <b>http://localhost:3000</b> · Mock: <b>http://localhost:4000</b>');
       log('Presiona <span class="t-step">Crear pago</span> o <span class="t-step">Ejecutar flujo completo</span>.');
     })().catch((e) => logErr(e));
